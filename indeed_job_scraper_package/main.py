@@ -5,7 +5,11 @@ import time
 from functions import *
 
 
-def scrape_indeed(city_set = ["Massachusetts"], job_set = ["data"], max_results_per_city = 2000):
+def scrape_indeed(input_dict, max_results_per_city = 2000):
+
+    city_set = input_dict['zipcode']
+    job_set = input_dict['query']
+
     # file num
     file = 1
 
@@ -49,7 +53,7 @@ def scrape_indeed(city_set = ["Massachusetts"], job_set = ["data"], max_results_
                 + str(city)
                 + "&radius=10&sort=date"
             )
-
+            print(link)
             # get dom
             page = requests.get(link)
 
@@ -60,6 +64,7 @@ def scrape_indeed(city_set = ["Massachusetts"], job_set = ["data"], max_results_
             soup = get_soup(page.text)
             page.close()
             searchCountpages = soup.find_all(name="div", attrs={"id": "searchCountPages"})
+            print(searchCountpages)
 
             total_results = searchCountpages[0].get_text().strip().split(" ")[3]
             total_results = int(total_results.replace(",", ""))
@@ -78,7 +83,7 @@ def scrape_indeed(city_set = ["Massachusetts"], job_set = ["data"], max_results_
                     + str(start)
                     + "&radius=10&sort=date"
                 )
-                print(link)
+                # print(link)
                 print("Getting results %i out of %i" % (start, total_results))
                 # get dom
                 page = requests.get(link)
@@ -160,7 +165,7 @@ def scrape_indeed(city_set = ["Massachusetts"], job_set = ["data"], max_results_
                 )
 
             # saving df as a local csv file
-            df.to_json("indeed.json", orient='records', lines=True)
+            df.to_json("indeed.json", orient='records')
 
             # df.to_csv("jobs_" + str(file) + ".csv", encoding="utf-8")
 
@@ -187,4 +192,5 @@ def scrape_indeed(city_set = ["Massachusetts"], job_set = ["data"], max_results_
             file = file + 1
 
 if __name__ == "__main__":
-    scrape_indeed(city_set = ["Massachusetts"], job_set = ["data"], max_results_per_city = 20)
+    input = {'zipcode': ['Massachusetts'], 'query': ['data']}
+    scrape_indeed(input, max_results_per_city = 20)
