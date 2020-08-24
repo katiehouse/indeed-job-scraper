@@ -27,9 +27,8 @@ def extract_salary(div):
         return div.find("nobr").text
     except:
         try:
-            div_two = div.find(name="div", attrs={"class": "sjcl"})
-            div_three = div_two.find("div")
-            return div_three.text.strip()
+            span = div.find_all(name="span", attrs={"class": "salaryText"})
+            return span[0].get_text()
         except:
             return "NOT_FOUND"
     return "NOT_FOUND"
@@ -54,8 +53,10 @@ def extract_job_title(div):
 
 
 # extract jd summary
-def extract_summary(div):
-    spans = div.findAll("span", attrs={"class": "summary"})
+def extract_summary(link):
+    page = requests.get(link)
+    soup = get_soup(page.text)
+    spans = soup.find_all(name="div", attrs={"id": "jobDescriptionText"})
     for span in spans:
         return span.text.strip()
     return "NOT_FOUND"
@@ -63,9 +64,10 @@ def extract_summary(div):
 
 # extract link of job description
 def extract_link(div):
-    for a in div.find_all(name="a", attrs={"data-tn-element": "jobTitle"}):
-        return a["href"]
-    return "NOT_FOUND"
+    try:
+        return "https://www.indeed.com/viewjob?jk=" + div['data-jk']
+    except:
+        return "NOT_FOUND"
 
 
 # extract date of job when it was posted

@@ -5,7 +5,7 @@ import time
 from functions import *
 
 
-def scrape_indeed(city_set = ["01002"], job_set = ["data"], max_results_per_city = 2000):
+def scrape_indeed(city_set = ["Massachusetts"], job_set = ["data"], max_results_per_city = 2000):
     # file num
     file = 1
 
@@ -34,9 +34,9 @@ def scrape_indeed(city_set = ["01002"], job_set = ["data"], max_results_per_city
                     "job_title",
                     "company_name",
                     "location",
+                    "link",
                     "summary",
                     "salary",
-                    "link",
                     "date",
                     "full_text",
                 ]
@@ -66,7 +66,7 @@ def scrape_indeed(city_set = ["01002"], job_set = ["data"], max_results_per_city
 
             if total_results > max_results_per_city:
                 total_results = max_results_per_city
-            
+
             # for results
             for start in range(0, total_results, 10):
                 link = (
@@ -78,7 +78,7 @@ def scrape_indeed(city_set = ["01002"], job_set = ["data"], max_results_per_city
                     + str(start)
                     + "&radius=10&sort=date"
                 )
-
+                print(link)
                 print("Getting results %i out of %i" % (start, total_results))
                 # get dom
                 page = requests.get(link)
@@ -97,7 +97,7 @@ def scrape_indeed(city_set = ["01002"], job_set = ["data"], max_results_per_city
 
                 # for all jobs on a page
                 for div in divs:
-
+                    print("new div")
                     # specifying row num for index of job posting in dataframe
                     num = len(df) + 1
                     cnt = cnt + 1
@@ -123,15 +123,15 @@ def scrape_indeed(city_set = ["01002"], job_set = ["data"], max_results_per_city
                     # grabbing location name
                     job_post.append(extract_location(div))
 
-                    # grabbing summary text
-                    job_post.append(extract_summary(div))
-
-                    # grabbing salary
-                    job_post.append(extract_salary(div))
-
                     # grabbing link
                     link = extract_link(div)
                     job_post.append(link)
+
+                    # grabbing summary text
+                    job_post.append(extract_summary(link))
+
+                    # grabbing salary
+                    job_post.append(extract_salary(div))
 
                     # grabbing date
                     job_post.append(extract_date(div))
@@ -187,4 +187,4 @@ def scrape_indeed(city_set = ["01002"], job_set = ["data"], max_results_per_city
             file = file + 1
 
 if __name__ == "__main__":
-    scrape_indeed(city_set = ["01002"], job_set = ["data"], max_results_per_city = 20)
+    scrape_indeed(city_set = ["Massachusetts"], job_set = ["data"], max_results_per_city = 20)
